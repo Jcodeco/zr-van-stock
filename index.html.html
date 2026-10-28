@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZR Van Stock &amp; Asset Check</title>
+<style>
+:root{--bg:#f2f5f8;--card:#fff;--tx:#17202a;--mu:#5a6672;--ln:#d3dae2;--ac:#1f3a5f;--acx:#fff;--fl:#eaf3ff;--ok:#1b7f4b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161d;--card:#1a232d;--tx:#e8edf2;--mu:#9aa8b5;--ln:#2e3b48;--ac:#3d6ba8;--acx:#fff;--fl:#22324a;--ok:#4cc38a}}
+:root[data-theme="dark"]{--bg:#10161d;--card:#1a232d;--tx:#e8edf2;--mu:#9aa8b5;--ln:#2e3b48;--ac:#3d6ba8;--acx:#fff;--fl:#22324a;--ok:#4cc38a}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:640px;padding:12px;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1{margin:0;font-size:1.2rem}
+.hd{background:var(--ac);color:var(--acx);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.hd p{margin:4px 0 0;font-size:.85rem;opacity:.9}
+.card,details{background:var(--card);border:1px solid var(--ln);border-radius:12px;margin-bottom:10px}
+.card{padding:12px}
+.card h2{margin:0 0 8px;font-size:.8rem;letter-spacing:.05em;color:var(--mu);text-transform:uppercase}
+label{display:block;font-size:.72rem;color:var(--mu);font-weight:600}
+input[type=text],input[type=number],input[type=date],textarea{width:100%;margin-top:3px;padding:10px;font:inherit;color:var(--tx);background:var(--fl);border:1px solid var(--ln);border-radius:8px}
+input:focus,textarea:focus{outline:2px solid var(--ac)}
+.d{display:grid;gap:10px;grid-template-columns:1fr 1fr}.d .w{grid-column:1/-1}
+summary{padding:14px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;gap:8px;list-style:none}
+summary::-webkit-details-marker{display:none}
+.cnt{font-weight:600;font-size:.78rem;color:var(--mu);white-space:nowrap}
+.cnt.ok{color:var(--ok)}
+.rows{padding:0 10px 4px}
+.row{border-top:1px solid var(--ln);padding:10px 2px}
+.t2{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.n{font-weight:600;flex:1}
+.t2 input[type=checkbox]{width:24px;height:24px;flex:none;accent-color:var(--ac)}
+.t2 input[type=text]{margin:0}
+.g{display:grid;gap:8px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1.4fr 1fr 1fr}.g4{grid-template-columns:1fr 1fr 1fr 1fr}
+.g4 label:first-child{grid-column:1/-1}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:13px;cursor:pointer;color:var(--acx);background:var(--ac);width:100%}
+button.s,a.b{background:transparent;color:var(--ac);border:1.5px solid var(--ac)}
+.x{width:36px;padding:6px;flex:none}
+.add{margin:6px 0 10px}
+.bt{display:grid;gap:8px;grid-template-columns:1fr 1fr}.bt .p{grid-column:1/-1}
+a.b{display:block;text-align:center;text-decoration:none;font-weight:700;border-radius:10px;padding:12px}
+#st{min-height:1.3em;margin:8px 0;font-size:.9rem;font-weight:600}
+textarea{min-height:90px}#pv{min-height:200px;font-size:.8rem}
+.nt{font-size:.78rem;color:var(--mu);margin:8px 0 0}
+</style>
+</head>
+<body>
+<div class="hd"><h1>ZR Van Stock &amp; Asset Check</h1><p>Fill in each section, then send the report at the bottom. Your answers save on this phone as you go.</p></div>
+
+<div class="card"><h2>Vehicle &amp; technician</h2>
+<div class="d">
+<label class="w">Technician name<input type="text" data-h="name" autocomplete="name"></label>
+<label>Date<input type="date" data-h="date"></label>
+<label>Vehicle reg<input type="text" data-h="reg" autocapitalize="characters"></label>
+<label>Current KLM<input type="text" data-h="klm" inputmode="numeric"></label>
+<label>Licence disc expiry<input type="date" data-h="exp"></label>
+</div></div>
+
+<div id="secs"></div>
+
+<div class="card"><h2>Notes</h2>
+<label>Faults, damaged or missing items, service due<textarea id="nt"></textarea></label></div>
+
+<div class="card"><h2>Send to ZR</h2>
+<div id="st" role="status" aria-live="polite"></div>
+<div class="bt">
+<button class="p" id="sh">Send report</button>
+<a class="b" id="wa" target="_blank" rel="noopener">WhatsApp</a>
+<a class="b" id="em" target="_blank" rel="noopener">Email</a>
+<button class="s" id="cp">Copy report</button>
+<button class="s" id="cl">Clear form</button>
+</div>
+<p class="nt">“Send report” opens your phone’s share menu so you can pick WhatsApp or email. Only items you filled in are included.</p>
+<details style="margin-top:10px"><summary>Preview report <span class="cnt"></span></summary><div class="rows"><textarea id="pv" readonly></textarea></div></details>
+</div>
+
+<script>
+const m=(p,l)=>l.map(x=>p+x);
+const IN=['1/4"','3/8"','1/2"','5/8"','3/4"','7/8"'];
+const S=[
+{t:'1. Refrigerant gas & cylinders',k:'gas',r:['R410A','R32','R22','R134a','R404A','R407C','R600a','R290','Nitrogen (OFN)','Oxygen (brazing)','Acetylene / LPG (brazing)']},
+{t:'2. Copper pipe & insulation',k:'qty',r:[...m('Copper pipe coil – ',IN),'Insulated pair coil – 1/4" + 3/8"','Insulated pair coil – 1/4" + 1/2"','Insulated pair coil – 3/8" + 5/8"',...m('Pipe insulation – ',IN.slice(0,5)),'Armaflex / insulation tape','PVC wrapping tape','Self-amalgamating tape','Aluminium foil tape']},
+{t:'3. Fittings & installation consumables',k:'qty',r:[...m('Flare nuts – ',IN.slice(0,5)),'Copper elbows (90°)','Copper couplings / joiners','Copper reducers','Copper tees','Schrader valve cores','Schrader valve caps','Service / access valves','Brazing rods – silver','Brazing rods – copper phosphorus','Brazing flux / paste','Wall brackets – outdoor unit (pair)','Rubber feet / anti-vibration mounts','Drain hose / condensate pipe','Drain elbows / adaptors','Condensate pump','Trunking','Wall sleeves / duct caps','Silicone / sealant','Rawl plugs & screws','Cable ties','Electrical cable – 3 core','Electrical cable – comms / 4 core','Isolator switches (outdoor)']},
+{t:'4. Capacitors, contactors & electrical',k:'qty',r:[...m('Fan capacitor – ',['1.5 µF','2 µF','2.5 µF','3 µF','4 µF','5 µF']),...m('Compressor run capacitor – ',['25 µF','30 µF','35 µF','40 µF','45 µF','50 µF']),'Dual run capacitor (state µF)','Dual run capacitor (state µF)','Contactor – single pole','Contactor – 2 pole','Contactor – 3 pole','Compressor start relay / PTC','Thermal overload','Fuses (assorted)','Terminal blocks / connectors','Lever / Wago connectors','Crimp lugs & spade connectors']},
+{t:'5. Fan motors & moving parts',k:'qty',r:['Indoor fan motor – split wall unit','Indoor fan motor – cassette / ducted','Outdoor fan motor (model / W)','Outdoor fan motor (model / W)','Outdoor fan motor (model / W)','Outdoor fan blade (size)','Cross-flow blower wheel (indoor)','Louvre / swing stepper motor','Evaporator fan motor – commercial / cold room','Cassette drain pump','Fan motor mounting brackets']},
+{t:'6. Controllers, thermostats & remotes',k:'qty',r:['Universal remote – split units','Universal remote – other (state type)','Brand-specific remote (state brand)','Wired wall controller','Digital room thermostat','Programmable thermostat','Defrost thermostat / sensor','Room temperature sensor / thermistor','Coil (pipe) temperature sensor','Universal PCB – indoor','Universal PCB – outdoor','Cold room / refrigeration controller','NTC / refrigeration probe','Remote holders','Batteries – AAA']},
+{t:'7. Refrigeration & system spares',k:'qty',r:['Filter drier (state size)','Filter drier (state size)','Reversing (4-way) valve','Expansion valve (TXV / EEV coil)','Capillary tube','HP / LP pressure switch','Crankcase heater','Sight glass','Compressor (state model)','Refrigerant oil – POE / mineral']},
+{t:'8. Chemicals & consumables',k:'qty',r:['Coil cleaner','Anti-bacterial / sanitiser spray','Leak detection spray / fluid','Vacuum pump oil','Flushing solvent','Contact cleaner','Rags / cleaning cloths','Gloves & PPE consumables']},
+{t:'9. ZR company tools & equipment',k:'tools',r:['Porta pack','Step ladder (state size)','Extension ladder (state size)','Manifold gauge set','Digital manifold / gauges','Vacuum pump','Micron / vacuum gauge','Recovery machine','Recovery cylinder','Digital gas scale','Electronic leak detector','Nitrogen regulator & test hose','Multimeter','Clamp meter','Digital thermometer / probes','Flaring tool set','Pipe cutter','Pipe bender / bending springs','Swaging tool set','Deburring / reaming tool','Schrader core removal tool','Cordless drill + batteries / charger','Hammer drill (SDS)','Hole saw / core bit set','Torque wrench','Fin comb','Pump sprayer / coil cleaning kit','Extension cord / cable reel','Tool box / tool bag']}
+];
+const F={
+gas:[['s','Size (kg)','t'],['a','Full','n'],['b','Part','n'],['c','Empty','n']],
+qty:[['s','Size / spec','t'],['a','On van','n'],['b','To order','n']],
+tools:[['s','Serial / asset no.','t'],['a','Condition / notes','t']]};
+const NEW={gas:'Add another gas / cylinder',qty:'Add an item not listed',tools:'Add another ZR tool'};
+let st={h:{},v:{},x:{},n:''};
+try{const s=localStorage.getItem('zrvan26');if(s)st=Object.assign(st,JSON.parse(s))}catch(e){}
+if(!st.h.date)st.h.date=new Date().toLocaleDateString('en-CA');
+const save=()=>{try{localStorage.setItem('zrvan26',JSON.stringify(st))}catch(e){}};
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const filled=o=>Object.entries(o).some(([k,v])=>k!=='n'&&v);
+const cnts=[];
+function count(i){return Object.keys(st.v).filter(k=>k.startsWith(i+'_')&&filled(st.v[k])).length+(st.x[i]||[]).filter(filled).length}
+function upd(){S.forEach((s,i)=>{const n=count(i),c=cnts[i];c.textContent=n+' filled';c.className='cnt'+(n?' ok':'')});save()}
+function mkRow(kind,name,d,custom,del){
+ const r=el('div','row'),top=el('div','t2');
+ if(kind==='tools'){const cb=el('input');cb.type='checkbox';cb.checked=!!d.k;cb.setAttribute('aria-label','On van');cb.onchange=()=>{d.k=cb.checked;upd()};top.append(cb)}
+ if(custom){const ni=el('input');ni.type='text';ni.placeholder='Item name';ni.value=d.n||'';ni.oninput=()=>{d.n=ni.value;save()};top.append(ni);const b=el('button','s x','×');b.setAttribute('aria-label','Remove');b.onclick=del;top.append(b)}
+ else top.append(el('div','n',name));
+ r.append(top);
+ const g=el('div','g g'+F[kind].length);
+ F[kind].forEach(([f,l,ty])=>{const lb=el('label');lb.append(l);const i=el('input');
+  if(ty==='n'){i.type='number';i.inputMode='decimal';i.min=0}else i.type='text';
+  i.value=d[f]||'';i.oninput=()=>{d[f]=i.value;upd()};lb.append(i);g.append(lb)});
+ r.append(g);return r}
+function render(){
+ const box=document.getElementById('secs');box.textContent='';cnts.length=0;
+ S.forEach((s,i)=>{
+  const dt=el('details');if(i===0)dt.open=true;
+  const sm=el('summary');sm.append(el('span',null,s.t));const c=el('span','cnt');cnts.push(c);sm.append(c);dt.append(sm);
+  const rows=el('div','rows');
+  s.r.forEach((n,j)=>{const k=i+'_'+j;rows.append(mkRow(s.k,n,st.v[k]||(st.v[k]={}),false))});
+  const xs=st.x[i]||(st.x[i]=[]);
+  const xb=el('div');
+  const paint=()=>{xb.textContent='';xs.forEach((d,q)=>xb.append(mkRow(s.k,'',d,true,()=>{xs.splice(q,1);paint();upd()})))};
+  paint();rows.append(xb);
+  const a=el('button','s add','+ '+NEW[s.k]);a.onclick=()=>{xs.push({n:''});paint()};rows.append(a);
+  dt.append(rows);box.append(dt)});
+ upd()}
+document.querySelectorAll('[data-h]').forEach(i=>{i.value=st.h[i.dataset.h]||'';i.oninput=()=>{st.h[i.dataset.h]=i.value;save()}});
+const nt=document.getElementById('nt');nt.value=st.n||'';nt.oninput=()=>{st.n=nt.value;save()};
+function report(){
+ const h=st.h,L=['ZR VAN STOCK & ASSET CHECK','Technician: '+(h.name||'-'),'Date: '+(h.date||'-'),'Vehicle reg: '+(h.reg||'-'),'Current KLM: '+(h.klm||'-'),'Licence expiry: '+(h.exp||'-'),''];
+ S.forEach((s,i)=>{
+  const all=[];s.r.forEach((n,j)=>all.push([n,st.v[i+'_'+j]||{}]));(st.x[i]||[]).forEach(d=>all.push([d.n||'(unnamed)',d]));
+  const out=[],miss=[];
+  all.forEach(([n,d])=>{
+   if(s.k==='tools'){if(d.k)out.push('- '+n+' [on van]'+(d.s?' S/N '+d.s:'')+(d.a?' - '+d.a:''));else if(s.r.includes(n))miss.push(n)}
+   else if(filled(d)){
+    if(s.k==='gas')out.push('- '+n+(d.s?' ('+d.s+')':'')+': Full '+(d.a||0)+', Part '+(d.b||0)+', Empty '+(d.c||0));
+    else out.push('- '+n+(d.s?' ['+d.s+']':'')+': On van '+(d.a||0)+(d.b?', ORDER '+d.b:''))}});
+  if(out.length||miss.length){L.push(s.t.toUpperCase());L.push(...out);if(miss.length)L.push('Not on van: '+miss.join(', '));L.push('')}});
+ if(st.n)L.push('NOTES',st.n,'');
+ L.push('Technician confirms this is a true record of stock and ZR equipment on the vehicle.');
+ return L.join('\n')}
+const stt=document.getElementById('st');
+const say=(t,bad)=>{stt.textContent=t;stt.style.color=bad?'#c0392b':'var(--ok)'};
+const ready=()=>{if(!st.h.name||!st.h.reg){say('Please enter your name and the vehicle reg first.',1);return false}return true};
+async function copy(){const t=report();try{await navigator.clipboard.writeText(t)}catch(e){const a=el('textarea');a.value=t;document.body.append(a);a.select();try{document.execCommand('copy')}catch(_){}a.remove()}say('Report copied. Paste it into WhatsApp or email.')}
+document.getElementById('cp').onclick=()=>{if(ready())copy()};
+document.getElementById('sh').onclick=async()=>{if(!ready())return;const t=report();
+ if(navigator.share){try{await navigator.share({title:'ZR van stock – '+st.h.reg,text:t});say('Shared.');return}catch(e){if(e&&e.name==='AbortError')return}}
+ copy()};
+document.getElementById('wa').onclick=function(e){if(!ready()){e.preventDefault();return}this.href='https://wa.me/?text='+encodeURIComponent(report())};
+document.getElementById('em').onclick=function(e){if(!ready()){e.preventDefault();return}this.href='mailto:?subject='+encodeURIComponent('Van stock – '+st.h.reg+' – '+(st.h.name||''))+'&body='+encodeURIComponent(report())};
+const pvd=document.querySelector('#pv').closest('details');pvd.addEventListener('toggle',()=>{if(pvd.open)document.getElementById('pv').value=report()});
+let ct;const cl=document.getElementById('cl');
+cl.onclick=()=>{if(!ct){cl.textContent='Tap again to clear everything';ct=setTimeout(()=>{cl.textContent='Clear form';ct=0},4000);return}
+ clearTimeout(ct);ct=0;cl.textContent='Clear form';st={h:{date:new Date().toLocaleDateString('en-CA')},v:{},x:{},n:''};save();
+ document.querySelectorAll('[data-h]').forEach(i=>i.value=st.h[i.dataset.h]||'');nt.value='';render();say('Form cleared.')};
+render();
+</script>
+</body>
+</html>
